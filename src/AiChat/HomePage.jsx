@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 
 const HeroSection = () => {
   return (
-    <div className="relative flex flex-col text-white items-center md:h-[100vh]  h-screen overflow-hidden font-sans">
+    <div className="relative flex flex-col text-white items-center md:h-[100vh]  h-screen overflow-hidden bg-black font-sans">
       {/* Background Video */}
       <video
         autoPlay
