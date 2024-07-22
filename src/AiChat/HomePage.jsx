@@ -46,7 +46,7 @@ const HeroSection = () => {
             Helping you navigate through tasks and providing quick responses to all your queries.
           </p>
           <Link to="/aichat">
-            <button className="button border flex border-primary text-primary bg-white hover:text-white hover:bg-secondary transition duration-300 ease-in-out py-1 px-4 md:py-4 md:px-7 rounded-full shadow-lg">
+            <button className="button border flex border-primary text-primary bg-white hover:text-white hover:bg-secondary transition duration-300 ease-in-out py-3 px-6 md:py-4 md:px-7 rounded-full shadow-lg">
               Get Started <MdArrowForward className="text-xl md:text-2xl ml-2" />
             </button>
           </Link>
