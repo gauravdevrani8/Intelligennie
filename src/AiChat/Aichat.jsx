@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
-import { FiTrash2, FiSend } from 'react-icons/fi'; 
+import { FiTrash2, FiSend, FiMenu, FiX } from 'react-icons/fi'; 
 import { HiOutlineClipboardCopy } from 'react-icons/hi'; 
 import { GiMagicLamp } from "react-icons/gi";
 
@@ -12,7 +12,8 @@ const Aichat = () => {
   const [answer, setAnswer] = useState('');
   const [generatingAnswer, setGeneratingAnswer] = useState(false);
   const [searchHistory, setSearchHistory] = useState([]);
-  const [debounceTimer, setDebounceTimer] = useState(null); // New state for debounce timer
+  const [debounceTimer, setDebounceTimer] = useState(null);
+  const [showHistory, setShowHistory] = useState(false); // State for sidebar visibility
   const cache = useRef({});
 
   useEffect(() => {
@@ -89,72 +90,114 @@ const Aichat = () => {
   };
 
   return (
-    <div className="max-w-screen mx-auto bg-[#161315] min-h-screen px-4 py-8">
-      <h1 className="text-4xl font-cinzel font-semibold text-center mb-8 text-[#F58840] flex items-center justify-center">
-        <GiMagicLamp className="mr-2 text-[#F58840] text-4xl" /> IntelliGenie
-      </h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="col-span-2 bg-[#161315] rounded-lg p-4">
-          {/* Suspense component to handle the loading state */}
-          <Suspense fallback={<div className="text-gray-200 md:text-lg mb-4">Loading...</div>}>
-            {/* ReactMarkdown component is rendered only when it's needed */}
-            <ReactMarkdown className="text-gray-200 md:text-lg mb-4">{answer}</ReactMarkdown>
-          </Suspense>
-          <div className="mb-4 flex items-center">
-            <input
-              required
-              type="text"
-              className="border border-gray-300 rounded-full w-full my-2 p-3 mr-2 focus:border-[#F58840] focus:outline-none"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              onKeyDown={handleKeyDown} // Add onKeyDown event handler
-              placeholder="Ask anything..."
-            />
-            <button
-              type="button"
-              onClick={handleSendClick}
-              className={`bg-[#F58840] text-gray-200 p-3 rounded-full hover:bg-gray-600 transition-all duration-300 ${generatingAnswer ? 'opacity-50 cursor-not-allowed' : ''}`}
-              disabled={generatingAnswer}
-            >
-              <FiSend className="inline-block mr-1 text-xl" />
-            </button>
+    <div className="flex flex-col h-screen bg-gray-900">
+      <header className="bg-gray-800 text-gray-300 p-4 shadow-md flex items-center justify-between">
+        <h1 className="text-3xl font-semibold text-[#F58840] flex items-center">
+          <GiMagicLamp className="mr-2 text-[#F58840] text-3xl" /> IntelliGenie
+        </h1>
+        <button
+          onClick={() => setShowHistory(!showHistory)}
+          className="lg:hidden text-gray-400 hover:text-white focus:outline-none"
+        >
+          <FiMenu className="text-2xl" />
+        </button>
+      </header>
+      <div className="flex flex-1 overflow-hidden">
+        {/* Chat Area */}
+        <main className="flex-1 bg-gray-800 text-gray-200 shadow-lg p-6 flex flex-col relative">
+          <div className="flex-1 overflow-auto mb-4">
+            <div className="space-y-4">
+              {/* User question and answer bubbles */}
+              <div className="flex flex-col">
+                {searchHistory.map((query, index) => (
+                  <div key={index} className="flex flex-col mb-2">
+                    <div className="bg-gray-700 text-gray-200 p-3 rounded-lg">
+                      <ReactMarkdown className="text-lg">{query}</ReactMarkdown>
+                    </div>
+                  </div>
+                ))}
+                {answer && (
+                  <div className="flex flex-col mb-2">
+                    <div className="bg-gray-700 text-gray-200 p-3 rounded-lg">
+                      <Suspense fallback={<div className="text-gray-400 text-lg">Loading...</div>}>
+                        <ReactMarkdown className="text-lg">{answer}</ReactMarkdown>
+                      </Suspense>
+                      {/* Copy Answer Button */}
+                      <button
+                        onClick={copyAnswerToClipboard}
+                        className="bg-[#F58840] text-white p-2 rounded-md hover:bg-[#e07b39] focus:outline-none flex items-center mt-2"
+                      >
+                        <HiOutlineClipboardCopy className="inline-block mr-2" /> Copy Answer
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-          {answer && (
-            <button
-              onClick={copyAnswerToClipboard}
-              className="mt-2 bg-[#F58840] text-white p-2 rounded-md hover:bg-gray-600 focus:outline-none flex items-center"
-            >
-              <HiOutlineClipboardCopy className="inline-block mr-1" /> Copy Answer
-            </button>
-          )}
-        </div>
-        <div className="col-span-1 bg-[#1a151a] min-h-auto border-l border-gray-300 p-4">
+          <div className="flex-none flex items-center mt-4">
+            {/* Search Bar */}
+            <div className="relative flex items-center w-full">
+              <input
+                required
+                type="text"
+                className="bg-gray-700 text-gray-200 placeholder-gray-400 rounded-full w-full p-3 pr-12 focus:outline-none focus:ring-2 focus:ring-[#F58840]"
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Ask anything..."
+              />
+              <button
+                type="button"
+                onClick={handleSendClick}
+                className={`absolute right-3 p-2 rounded-full bg-[#F58840] text-gray-200 hover:bg-[#e07b39] transition-all duration-300 ${generatingAnswer ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={generatingAnswer}
+              >
+                <FiSend className="text-xl" />
+              </button>
+            </div>
+          </div>
+        </main>
+        {/* Search History Area */}
+        <aside
+          className={`lg:w-80 lg:block bg-gray-700 shadow-lg p-6 overflow-auto transition-transform duration-300 ease-in-out ${
+            showHistory ? 'translate-x-0' : 'translate-x-full'
+          } fixed top-0 right-0 h-full lg:static lg:translate-x-0`}
+        >
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold text-[#F58840]">Search History</h2>
             <button
               onClick={clearHistory}
-              className="text-gray-200 hover:text-red-600 focus:outline-none"
+              className="text-gray-400 hover:text-red-500 focus:outline-none"
             >
               <FiTrash2 className="text-lg" />
             </button>
+            {/* Close Button */}
+            <button
+              onClick={() => setShowHistory(false)}
+              className="lg:hidden text-gray-400 hover:text-white focus:outline-none"
+            >
+              <FiX className="text-2xl" />
+            </button>
           </div>
-          <ul className="list-disc list-inside h-full overflow-y-auto">
+          <ul className="list-disc list-inside">
             {searchHistory.map((query, index) => (
-              <li key={index} className="flex justify-between items-center text-gray-200">
+              <li key={index} className="flex justify-between items-center text-gray-200 mb-2">
                 <span>{query}</span>
-                <div className="flex">
-                  <button
-                    onClick={() => removeFromHistory(index)}
-                    className="ml-2 text-red-600 hover:text-red-800 focus:outline-none"
-                  >
-                    <FiTrash2 />
-                  </button>
-                </div>
+                <button
+                  onClick={() => removeFromHistory(index)}
+                  className="ml-2 text-red-500 hover:text-red-700 focus:outline-none"
+                >
+                  <FiTrash2 />
+                </button>
               </li>
             ))}
           </ul>
-        </div>
+        </aside>
       </div>
+      <footer className="bg-gray-800 text-gray-400 p-4 text-center">
+        <p>© 2024 IntelliGenie. All rights reserved.</p>
+      </footer>
     </div>
   );
 };

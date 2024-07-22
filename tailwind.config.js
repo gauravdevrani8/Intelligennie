@@ -1,15 +1,16 @@
-// tailwind.config.js
-
-/** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     extend: {
       fontFamily: {
-        'cinzel': ['Cinzel', 'sans-serif'], // Specify Cinzel font family
+        sans: ['Montserrat', 'sans-serif'],
+      },
+      colors: {
+        primary: '#368075',
+        secondary: '#F58840',
+        accent: '#F5F5F5',
       },
     },
   },
